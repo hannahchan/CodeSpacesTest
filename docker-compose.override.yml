@@ -1,0 +1,35 @@
+---
+services:
+  scaffold:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+  postgres:
+    ports:
+      - mode: ingress
+        protocol: tcp
+        published: 5432
+        target: 5432
+  grafana:
+    volumes:
+      - source: "${LOCAL_WORKSPACE_FOLDER:-.}/Configurations/Grafana/dashboards"
+        target: /etc/grafana/provisioning/dashboards
+        type: bind
+      - source: "${LOCAL_WORKSPACE_FOLDER:-.}/Configurations/Grafana/datasources"
+        target: /etc/grafana/provisioning/datasources
+        type: bind
+  opentelemetry-collector:
+    ports:
+      - mode: ingress
+        protocol: tcp
+        published: 4317
+        target: 4317
+    volumes:
+      - source: "${LOCAL_WORKSPACE_FOLDER:-.}/Configurations/OpenTelemetry/otel-collector.config.yml"
+        target: /etc/otel-collector.config.yml
+        type: bind
+  prometheus:
+    volumes:
+      - source: "${LOCAL_WORKSPACE_FOLDER:-.}/Configurations/Prometheus/prometheus.yml"
+        target: /etc/prometheus/prometheus.yml
+        type: bind
+version: "3.7"

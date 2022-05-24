@@ -1,0 +1,25 @@
+---
+extensions: ~
+receivers:
+  otlp:
+    protocols:
+      grpc: ~
+processors: ~
+exporters:
+  jaeger:
+    endpoint: "jaeger:14250"
+    tls:
+      insecure: true
+  prometheus:
+    endpoint: "0.0.0.0:9090"
+service:
+  extensions: []
+  pipelines:
+    metrics:
+      exporters: [prometheus]
+      processors: []
+      receivers: [otlp]
+    traces:
+      exporters: [jaeger]
+      processors: []
+      receivers: [otlp]

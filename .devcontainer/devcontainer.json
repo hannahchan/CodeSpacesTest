@@ -1,0 +1,20 @@
+{
+  "dockerFile": "Dockerfile",
+  "extensions": ["ms-azuretools.vscode-docker", "ms-dotnettools.csharp"],
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind"
+  ],
+  "name": "Scaffold",
+  "overrideCommand": false,
+  "remoteEnv": {
+    "ConnectionStrings__DefaultConnection": "Host=host.docker.internal;Port=5432;Database=postgres;Username=postgres;",
+    "ConnectionStrings__ReadOnlyConnection": "Host=host.docker.internal;Port=5432;Database=postgres;Username=postgres;",
+    "OpenTelemetry__Otlp__Endpoint": "http://host.docker.internal:4317",
+    "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
+  },
+  "remoteUser": "vscode",
+  "runArgs": ["--init"],
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "bash"
+  }
+}
