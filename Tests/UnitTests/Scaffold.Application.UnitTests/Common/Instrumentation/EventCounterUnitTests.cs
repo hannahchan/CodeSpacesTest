@@ -17,7 +17,7 @@ public class EventCounterUnitTests
         {
             // Arrange
             EventCounter<AuditableEvent> eventCounter = new EventCounter<AuditableEvent>();
-            AuditableEvent auditableEvent = new AuditableEvent(default, default, default, "MyType", "MyDescription");
+            AuditableEvent auditableEvent = new AuditableEvent(default, default, default, default, "MyType", "MyDescription");
 
             // Act
             Exception exception = await Record.ExceptionAsync(() => eventCounter.Handle(auditableEvent, default));
@@ -26,8 +26,8 @@ public class EventCounterUnitTests
             Assert.Null(exception);
 
             Counter<long> counter = EventCounterAccessor.GetCounter();
-            Assert.Equal("application.events.count", counter.Name);
-            Assert.Equal("events", counter.Unit);
+            Assert.Equal("application.events", counter.Name);
+            Assert.Null(counter.Unit);
             Assert.Equal("measures the number of events that have been published to the in-process event bus", counter.Description);
         }
 
@@ -45,13 +45,13 @@ public class EventCounterUnitTests
             Assert.Null(exception);
 
             Counter<long> counter = EventCounterAccessor.GetCounter();
-            Assert.Equal("application.events.count", counter.Name);
-            Assert.Equal("events", counter.Unit);
+            Assert.Equal("application.events", counter.Name);
+            Assert.Null(counter.Unit);
             Assert.Equal("measures the number of events that have been published to the in-process event bus", counter.Description);
         }
     }
 
-    private record AuditableEvent(DateTime Timestamp, string TraceId, Type Source, string Type, string Description) : IAuditableEvent, INotification;
+    private record AuditableEvent(DateTime Timestamp, string TraceId, string SpanId, Type Source, string Type, string Description) : IAuditableEvent, INotification;
 
     private record GenericEvent() : INotification;
 

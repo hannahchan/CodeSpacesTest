@@ -16,10 +16,10 @@ public class EventLoggerUnitTests
         public async Task When_HandlingAuditableEvent_Expect_Logged()
         {
             // Arrange
-            Mock.Logger<EventLogger<AuditableEvent>> logger = new Mock.Logger<EventLogger<AuditableEvent>>();
+            Mock.Logger<AuditableEvent> logger = new Mock.Logger<AuditableEvent>();
             EventLogger<AuditableEvent> eventLogger = new EventLogger<AuditableEvent>(logger);
 
-            AuditableEvent auditableEvent = new AuditableEvent(default, default, default, "MyType", "MyDescription");
+            AuditableEvent auditableEvent = new AuditableEvent(default, default, default, default, "MyType", "MyDescription");
 
             // Act
             await eventLogger.Handle(auditableEvent, default);
@@ -38,7 +38,7 @@ public class EventLoggerUnitTests
         public async Task When_HandlingGenericEvent_Expect_Logged()
         {
             // Arrange
-            Mock.Logger<EventLogger<GenericEvent>> logger = new Mock.Logger<EventLogger<GenericEvent>>();
+            Mock.Logger<GenericEvent> logger = new Mock.Logger<GenericEvent>();
             EventLogger<GenericEvent> eventLogger = new EventLogger<GenericEvent>(logger);
 
             GenericEvent genericEvent = new GenericEvent();
@@ -57,7 +57,7 @@ public class EventLoggerUnitTests
         }
     }
 
-    private record AuditableEvent(DateTime Timestamp, string TraceId, Type Source, string Type, string Description) : IAuditableEvent, INotification;
+    private record AuditableEvent(DateTime Timestamp, string TraceId, string SpanId, Type Source, string Type, string Description) : IAuditableEvent, INotification;
 
     private record GenericEvent() : INotification;
 }

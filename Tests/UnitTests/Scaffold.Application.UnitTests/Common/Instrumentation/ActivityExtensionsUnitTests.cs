@@ -167,7 +167,7 @@ public static class ActivityExtensionsUnitTests
     }
 
     [Collection(TestCollection.Activity)]
-    public class InvokeIfNotNullAndIsAllDataRequested
+    public class InvokeIfRecording
     {
         [Fact]
         public void When_ActivityIsNull_Expect_NoException()
@@ -176,7 +176,7 @@ public static class ActivityExtensionsUnitTests
             Activity activity = null;
 
             // Act
-            Exception exception = Record.Exception(() => activity.InvokeIfNotNullAndIsAllDataRequested(activity =>
+            Exception exception = Record.Exception(() => activity.InvokeIfRecording(activity =>
                 activity.SetTag("Key", "Value")));
 
             // Assert
@@ -185,7 +185,7 @@ public static class ActivityExtensionsUnitTests
         }
 
         [Fact]
-        public void When_ActivityIsAllDataRequestIsFalse_Expect_NoException()
+        public void When_ActivityIsNotNullAllDataRequestIsFalse_Expect_NoException()
         {
             // Arrange
             using Activity activity = new Activity(Guid.NewGuid().ToString())
@@ -194,7 +194,7 @@ public static class ActivityExtensionsUnitTests
             };
 
             // Act
-            Exception exception = Record.Exception(() => activity.InvokeIfNotNullAndIsAllDataRequested(activity =>
+            Exception exception = Record.Exception(() => activity.InvokeIfRecording(activity =>
                 activity.SetTag("Key", "Value")));
 
             // Assert
@@ -212,7 +212,7 @@ public static class ActivityExtensionsUnitTests
             };
 
             // Act
-            Exception exception = Record.Exception(() => activity.InvokeIfNotNullAndIsAllDataRequested(activity =>
+            Exception exception = Record.Exception(() => activity.InvokeIfRecording(activity =>
                 activity.SetTag("Key", "Value")));
 
             // Assert
@@ -222,6 +222,48 @@ public static class ActivityExtensionsUnitTests
                 Assert.Equal("Key", tag.Key);
                 Assert.Equal("Value", tag.Value);
             });
+        }
+    }
+
+    [Collection(TestCollection.Activity)]
+    public class RecordException
+    {
+        [Fact]
+        public void When_RecordingException_Expect_ExceptionRecorded()
+        {
+            // Arrange
+            using Activity activity = new Activity(nameof(activity));
+
+            Exception exception = new InvalidOperationException("My Test Exception");
+
+            // Act
+            activity.Start();
+            activity.RecordException(exception);
+
+            // Assert
+            Assert.Collection(
+                activity.Events,
+                activityEvent =>
+                {
+                    Assert.Equal("exception", activityEvent.Name);
+                    Assert.Collection(
+                        activityEvent.Tags,
+                        tag =>
+                        {
+                            Assert.Equal("exception.type", tag.Key);
+                            Assert.Equal("System.InvalidOperationException", tag.Value);
+                        },
+                        tag =>
+                        {
+                            Assert.Equal("exception.message", tag.Key);
+                            Assert.Equal("My Test Exception", tag.Value);
+                        },
+                        tag =>
+                        {
+                            Assert.Equal("exception.stacktrace", tag.Key);
+                            Assert.Equal(exception.ToString(), tag.Value);
+                        });
+                });
         }
     }
 }

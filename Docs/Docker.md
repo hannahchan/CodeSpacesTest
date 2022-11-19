@@ -22,7 +22,7 @@ To stop the service running in Docker, run;
 
 This will stop the service and the PostgreSQL containers that were running in the background. This command will also leave behind a Docker volume belonging to PostgreSQL which contains any data that was persisted to the database. To remove this volume, run;
 
-    docker-compose down --volume
+    docker-compose down --volumes
 
 ## Running the PostgreSQL Database Only
 
@@ -36,7 +36,7 @@ To run the service natively on your computer, change directory to the [Scaffold.
 
     dotnet run
 
-Once up and running you can access the service on `http://localhost:5000`.
+Once up and running you can access the service on `http://localhost`.
 
 ## Running other Services Locally
 

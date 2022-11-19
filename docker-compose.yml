@@ -10,17 +10,14 @@ services:
     environment:
       ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=postgres;Username=postgres;
       ConnectionStrings__ReadOnlyConnection: Host=postgres;Port=5432;Database=postgres;Username=postgres;
-      OpenTelemetry__Otlp__Endpoint: "http://opentelemetry-collector:4317"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://opentelemetry-collector:4317"
+      OTEL_SERVICE_NAME: Scaffold
     image: "${DOCKER_REGISTRY}scaffold"
     ports:
       - mode: ingress
         protocol: tcp
         published: 80
         target: 80
-      - mode: ingress
-        protocol: tcp
-        published: 8081
-        target: 8081
   postgres:
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
@@ -32,6 +29,7 @@ services:
   grafana:
     depends_on:
       - jaeger
+      - postgres
       - prometheus
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
@@ -72,10 +70,19 @@ services:
         target: /tmp
         type: volume
   opentelemetry-collector:
-    command: "--config=/etc/otel-collector.config.yml"
+    command:
+      [
+        "--config=/etc/otel-collector.config.yml",
+        "--feature-gates=pkg.translator.prometheus.NormalizeName",
+      ]
     depends_on:
       - jaeger
     image: otel/opentelemetry-collector-contrib
+    ports:
+      - mode: ingress
+        protocol: tcp
+        published: 55679
+        target: 55679
     volumes:
       - source: ./Configurations/OpenTelemetry/otel-collector.config.yml
         target: /etc/otel-collector.config.yml
